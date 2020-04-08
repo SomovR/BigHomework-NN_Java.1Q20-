@@ -28,4 +28,4 @@ Entity должны описывать варианты взаимодейств
 ## Evaluation and Feedback Process
 
 Запрос проверки осуществляется через отправку ссылки на git репозиторий с выполненной задачей.
-*[Forms] https://forms.office.com/Pages/ResponsePage.aspx?id=0HIbtJ9OJkyKaflJ82fJHaeWqIB3x9VNuKBJnf-qcwdURDVJSlFGU0VGMDJJUlBFUjM0NDRDVVlHNy4u
+* https://forms.office.com/Pages/ResponsePage.aspx?id=0HIbtJ9OJkyKaflJ82fJHaeWqIB3x9VNuKBJnf-qcwdURDVJSlFGU0VGMDJJUlBFUjM0NDRDVVlHNy4u
