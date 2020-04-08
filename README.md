@@ -24,3 +24,8 @@ Entity должны описывать варианты взаимодейств
 Реализовать контроллеры для CRUD операций, сервисы для каждой сущности, сделать через JAVA конфиг(spring boot переделать на annotation-конфиг), написать Unit тесты.
 ### Spring Boot: 
 Переделать сервис на Spring Boot и успешно прогнать Unit тесты.
+
+## Evaluation and Feedback Process
+
+Запрос проверки осуществляется через отправку ссылки на git репозиторий с выполненной задачей.
+![Forms] https://forms.office.com/Pages/ResponsePage.aspx?id=0HIbtJ9OJkyKaflJ82fJHaeWqIB3x9VNuKBJnf-qcwdURDVJSlFGU0VGMDJJUlBFUjM0NDRDVVlHNy4u
