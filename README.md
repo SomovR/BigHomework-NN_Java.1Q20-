@@ -29,3 +29,4 @@ Entity должны описывать варианты взаимодейств
 
 Запрос проверки осуществляется через отправку ссылки на git репозиторий с выполненной задачей.
 * https://forms.office.com/Pages/ResponsePage.aspx?id=0HIbtJ9OJkyKaflJ82fJHaeWqIB3x9VNuKBJnf-qcwdURDVJSlFGU0VGMDJJUlBFUjM0NDRDVVlHNy4u
+* Других домашних заданий больше не планируем в тренинге, поэтому dead line середина мая (или завершение тренинга)
