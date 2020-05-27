@@ -1,61 +1,97 @@
 package com.application.dao;
 
 import com.application.model.Ticket;
-import com.application.model.Visitor;
-import com.application.utils.HibernateSessionFactory;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.RollbackException;
 import java.util.List;
 
+@Repository
+
 public class TicketDaoImpl implements Dao<Ticket> {
+    private static final Logger logger = LogManager.getLogger(TicketDaoImpl.class);
+    private EntityManagerFactory entityManagerFactory;
+
+    public TicketDaoImpl(EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
+    }
+
     @Override
     public void add(Ticket ticket) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        Transaction tx1 = session.beginTransaction();
-        session.save(ticket);
-        tx1.commit();
-        session.close();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(ticket);
+        try {
+            entityManager.getTransaction().commit();
+            logger.info("Ticket has been added successfully " + ticket);
+        } catch (RollbackException e) {
+            entityManager.getTransaction().rollback();
+            logger.error("Ticket has not been added " + ticket);
+            e.printStackTrace();
+        } finally {
+            entityManager.close();
+        }
     }
 
     @Override
     public void edit(Ticket ticket) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        Transaction tx1 = session.beginTransaction();
-        session.update(ticket);
-        tx1.commit();
-        session.close();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.merge(ticket);
+        try {
+            entityManager.getTransaction().commit();
+            logger.info("Ticket has been edited successfully " + ticket);
+        } catch (RollbackException e) {
+            entityManager.getTransaction().rollback();
+            logger.error("Ticket has not been edited " + ticket);
+            e.printStackTrace();
+        } finally {
+            entityManager.close();
+        }
     }
 
     @Override
-    public void delete(Ticket ticket) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        Transaction tx1 = session.beginTransaction();
-        Visitor visitor = ticket.getVisitor();
-        if (visitor.getTicket() != null) {
-            visitor.setTicket(null);
+    public void delete(int id) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        Ticket ticket;
+        try {
+            ticket = entityManager.createQuery("SELECT t FROM Ticket t where t.id = :id", Ticket.class).setParameter("id", id).getSingleResult();
+            entityManager.remove(ticket);
+            entityManager.getTransaction().commit();
+            logger.info("Ticket has been deleted successfully " + ticket);
+        } catch (RollbackException e) {
+            entityManager.getTransaction().rollback();
+            logger.error("Ticket with such id has not been found " + id);
+            e.printStackTrace();
+        } finally {
+            entityManager.close();
         }
-        session.update(visitor);
-        session.delete(ticket);
-        tx1.commit();
-        session.close();
     }
 
     @Override
     public Ticket find(int id) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        Transaction tx1 = session.beginTransaction();
-        Ticket ticket = session.get(Ticket.class, id);
-        tx1.commit();
-        session.close();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        Ticket ticket = entityManager.createQuery("SELECT t FROM Ticket t where t.id = :id", Ticket.class).setParameter("id", id).getSingleResult();
+        logger.info("Ticket has been found successfully " + ticket);
+        entityManager.close();
         return ticket;
     }
 
     @Override
     public List<Ticket> findAll() {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        List<Ticket> ticketList = session.createQuery("from Ticket ").list();
-        session.close();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        List<Ticket> ticketList = entityManager.createQuery("from Ticket").getResultList();
+        for (Ticket ticket : ticketList) {
+            logger.info("Ticket has been found successfully " + ticket);
+        }
+        entityManager.close();
         return ticketList;
     }
 }

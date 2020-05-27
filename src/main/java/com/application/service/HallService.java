@@ -1,35 +1,42 @@
 package com.application.service;
 
-import com.application.dao.HallDaoImpl;
+import com.application.dao.Dao;
 import com.application.model.Hall;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public class HallService {
-    private HallDaoImpl hallDao = new HallDaoImpl();
+@Service
+public class HallService implements AppService<Hall> {
+    private final Dao<Hall> hallDao;
 
-    public void setHallDao(HallDaoImpl hallDao) {
+    public HallService(Dao<Hall> hallDao) {
         this.hallDao = hallDao;
     }
 
-    public void addHall(Hall hall) {
+    @Override
+    public void add(Hall hall) {
         this.hallDao.add(hall);
     }
 
-    public void editHall(Hall hall) {
+    @Override
+    public void edit(Hall hall) {
         this.hallDao.edit(hall);
     }
 
-    public void deleteHall(Hall hall) {
-        this.hallDao.delete(hall);
+    @Override
+    public void delete(int id) {
+        this.hallDao.delete(id);
     }
 
-    public Hall findHallById(int id) {
+    @Override
+    public Hall find(int id) {
         return this.hallDao.find(id);
     }
 
-    public List<Hall> findHalls() {
+    @Override
+    public List<Hall> findAll() {
         return this.hallDao.findAll();
     }
-
 }
