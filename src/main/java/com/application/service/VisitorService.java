@@ -1,34 +1,42 @@
 package com.application.service;
 
-import com.application.dao.VisitorDaoImpl;
+import com.application.dao.Dao;
 import com.application.model.Visitor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public class VisitorService {
-    private VisitorDaoImpl visitorDao = new VisitorDaoImpl();
+@Service
+public class VisitorService implements AppService<Visitor>{
+    private final Dao<Visitor> visitorDao;
 
-    public void setVisitorDao(VisitorDaoImpl visitorDao) {
+    public VisitorService(Dao<Visitor> visitorDao) {
         this.visitorDao = visitorDao;
     }
 
-    public void addVisitor(Visitor visitor) {
+
+    @Override
+    public void add(Visitor visitor) {
         this.visitorDao.add(visitor);
     }
 
-    public void editVisitor(Visitor visitor) {
+    @Override
+    public void edit(Visitor visitor) {
         this.visitorDao.edit(visitor);
     }
 
-    public void deleteVisitor(Visitor visitor) {
-        this.visitorDao.delete(visitor);
+    @Override
+    public void delete(int id) {
+        this.visitorDao.delete(id);
     }
 
-    public Visitor findVisitorById(int id) {
+    @Override
+    public Visitor find(int id) {
         return this.visitorDao.find(id);
     }
 
-    public List<Visitor> findVisitors() {
+    @Override
+    public List<Visitor> findAll() {
         return this.visitorDao.findAll();
     }
 }

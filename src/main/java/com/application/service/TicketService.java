@@ -1,34 +1,41 @@
 package com.application.service;
 
-import com.application.dao.TicketDaoImpl;
+import com.application.dao.Dao;
 import com.application.model.Ticket;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public class TicketService {
-    private TicketDaoImpl ticketDao = new TicketDaoImpl();
+@Service
+public class TicketService implements AppService<Ticket> {
+    private final Dao<Ticket> ticketDao;
 
-    public void setTicketDao(TicketDaoImpl ticketDao) {
+    public TicketService(Dao<Ticket> ticketDao) {
         this.ticketDao = ticketDao;
     }
 
-    public void addTicket(Ticket ticket) {
+    @Override
+    public void add(Ticket ticket) {
         this.ticketDao.add(ticket);
     }
 
-    public void editTicket(Ticket ticket) {
+    @Override
+    public void edit(Ticket ticket) {
         this.ticketDao.edit(ticket);
     }
 
-    public void deleteTicket(Ticket ticket) {
-        this.ticketDao.delete(ticket);
+    @Override
+    public void delete(int id) {
+        this.ticketDao.delete(id);
     }
 
-    public Ticket findTicketById(int id) {
+    @Override
+    public Ticket find(int id) {
         return this.ticketDao.find(id);
     }
 
-    public List<Ticket> findTickets() {
+    @Override
+    public List<Ticket> findAll() {
         return this.ticketDao.findAll();
     }
 }

@@ -1,8 +1,8 @@
-package com.application.dao;
+package com.application.service;
 
 import java.util.List;
 
-public interface Dao<T> {
+public interface AppService<T> {
     public void add(T t);
 
     public void edit(T t);

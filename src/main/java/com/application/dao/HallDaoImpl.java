@@ -2,59 +2,103 @@ package com.application.dao;
 
 import com.application.model.Hall;
 import com.application.model.Movie;
-import com.application.utils.HibernateSessionFactory;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.RollbackException;
 import java.util.List;
 
+@Repository
 public class HallDaoImpl implements Dao<Hall> {
+    private static final Logger logger = LogManager.getLogger(HallDaoImpl.class);
+
+    private EntityManagerFactory entityManagerFactory;
+
+    public HallDaoImpl(EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
+    }
+
     @Override
     public void add(Hall hall) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        Transaction tx1 = session.beginTransaction();
-        session.save(hall);
-        tx1.commit();
-        session.close();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(hall);
+        try {
+            entityManager.getTransaction().commit();
+            logger.info("Hall has been added successfully " + hall);
+        } catch (RollbackException e) {
+            entityManager.getTransaction().rollback();
+            logger.error("Hall has not been added " + hall);
+            e.printStackTrace();
+        } finally {
+            entityManager.close();
+        }
     }
 
     @Override
     public void edit(Hall hall) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        Transaction tx1 = session.beginTransaction();
-        session.update(hall);
-        tx1.commit();
-        session.close();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.merge(hall);
+        try {
+            entityManager.getTransaction().commit();
+            logger.info("Hall has been edited successfully " + hall);
+        } catch (RollbackException e) {
+            entityManager.getTransaction().rollback();
+            logger.error("Hall has not been edited " + hall);
+            e.printStackTrace();
+        } finally {
+            entityManager.close();
+        }
     }
 
     @Override
-    public void delete(Hall hall) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        Transaction tx1 = session.beginTransaction();
-        for (Movie movie : hall.getMovieList()) {
-            movie.getHallList().remove(hall);
-            hall.getMovieList().remove(movie);
-            session.update(movie);
-            session.update(hall);
+    public void delete(int id) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        Hall hall;
+        try {
+            hall = entityManager.createQuery("SELECT h FROM Hall h where h.id = :id", Hall.class).setParameter("id", id).getSingleResult();
+            for (Movie movie : hall.getMovieList()) {
+                movie.getHallList().remove(hall);
+                hall.getMovieList().remove(movie);
+                entityManager.merge(movie);
+                entityManager.merge(hall);
+            }
+            entityManager.remove(hall);
+            entityManager.getTransaction().commit();
+            logger.info("Hall has been deleted successfully " + hall);
+        } catch (RollbackException e) {
+            entityManager.getTransaction().rollback();
+            logger.error("Hall with such id has not been found " + id);
+            e.printStackTrace();
+        } finally {
+            entityManager.close();
         }
-        session.delete(hall);
-        tx1.commit();
-        session.close();
     }
 
     @Override
     public Hall find(int id) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        Hall hall = session.get(Hall.class, id);
-        session.close();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        Hall hall = entityManager.createQuery("SELECT h FROM Hall h where h.id = :id", Hall.class).setParameter("id", id).getSingleResult();
+        logger.info("Hall has been found successfully " + hall);
+        entityManager.close();
         return hall;
     }
 
     @Override
     public List<Hall> findAll() {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        List<Hall> hallList = session.createQuery("from Hall").list();
-        session.close();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        List<Hall> hallList = entityManager.createQuery("from Hall").getResultList();
+        for (Hall hall : hallList) {
+            logger.info("Hall has been found successfully " + hall);
+        }
+        entityManager.close();
         return hallList;
     }
 }
